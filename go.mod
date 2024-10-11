@@ -1,4 +1,4 @@
-module config
+module github.com/doptime/config
 
 go 1.22.3
 

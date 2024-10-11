@@ -1,6 +1,6 @@
 package api
 
-import "config"
+import "github.com/doptime/config"
 
 // the http rpc server
 type ApiSourceHttp struct {

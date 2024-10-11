@@ -1,7 +1,7 @@
 package http
 
 import (
-	"config"
+	"github.com/doptime/config"
 )
 
 type ConfigHttp struct {

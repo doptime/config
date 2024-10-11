@@ -1,11 +1,13 @@
 package redisdb
 
 import (
-	"config"
-	"config/utils"
 	"context"
 	"strconv"
 	"time"
+
+	"github.com/doptime/config/utils"
+
+	"github.com/doptime/config"
 
 	"github.com/doptime/doptime/dlog"
 	cmap "github.com/orcaman/concurrent-map/v2"

@@ -1,7 +1,7 @@
 package settings
 
 import (
-	"config"
+	"github.com/doptime/config"
 
 	"github.com/doptime/doptime/dlog"
 	"github.com/rs/zerolog"

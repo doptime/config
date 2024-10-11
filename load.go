@@ -1,7 +1,7 @@
 package config
 
 import (
-	util "config/utils"
+	util "github.com/doptime/config/utils"
 
 	"github.com/doptime/doptime/dlog"
 )
