@@ -35,7 +35,7 @@ type DataSource struct {
 //	DB = 0
 var redisSources []*DataSource
 
-var Rds cmap.ConcurrentMap[string, *redis.Client] = cmap.New[*redis.Client]()
+var Servers cmap.ConcurrentMap[string, *redis.Client] = cmap.New[*redis.Client]()
 
 func AfterLoad() (err error) {
 	dlog.Info().Str("Checking Redis", "Start").Send()
@@ -59,18 +59,18 @@ func AfterLoad() (err error) {
 		}
 		//save to the list
 		dlog.Info().Str("Redis Load ", "Success").Any("RedisUsername", rdsCfg.Username).Any("RedisHost", rdsCfg.Host).Any("RedisPort", rdsCfg.Port).Send()
-		Rds.Set(rdsCfg.Name, rdsClient)
+		Servers.Set(rdsCfg.Name, rdsClient)
 		timeCmd := rdsClient.Time(context.Background())
 		dlog.Info().Any("Redis server time: ", timeCmd.Val().String()).Send()
 		//ping the address of redisAddress, if failed, print to log
 		utils.PingServer(rdsCfg.Host, true)
 	}
 	//check if default redis is set
-	if _rds, ok := Rds.Get("default"); !ok {
+	if _rds, ok := Servers.Get("default"); !ok {
 		dlog.Warn().Msg("\"default\" redis server missing in Configuration. RPC will can not be received. Please ensure this is what your want")
 		return
 	} else {
-		Rds.Set("", _rds)
+		Servers.Set("", _rds)
 		dlog.RdsClientToLog = _rds
 	}
 	return nil
