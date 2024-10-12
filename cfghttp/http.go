@@ -23,6 +23,8 @@ var CORES = "*"
 var Port int64 = 80
 var Path = "/"
 var MaxBufferSize = int64(10485760)
+var JWTSecret string = ""
+var AutoDataAuth bool = false
 var SUToken string = ""
 
 func init() {
@@ -32,5 +34,7 @@ func init() {
 	Port = httpOption.Port
 	Path = httpOption.Path
 	MaxBufferSize = httpOption.MaxBufferSize
+	JWTSecret = httpOption.JwtSecret
+	AutoDataAuth = httpOption.AutoDataAuth
 	SUToken = httpOption.SUToken
 }
