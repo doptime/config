@@ -1,4 +1,4 @@
-package cfredis
+package cfgredis
 
 import (
 	"context"
