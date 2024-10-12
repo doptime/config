@@ -1,6 +1,10 @@
 package api
 
-import "github.com/doptime/config"
+import (
+	"github.com/doptime/config"
+
+	cmap "github.com/orcaman/concurrent-map/v2"
+)
 
 // the http rpc server
 type ApiSourceHttp struct {
@@ -12,8 +16,13 @@ type ApiSourceHttp struct {
 
 var _defaultHttpRPC = &ApiSourceHttp{Name: "doptime", UrlBase: "https://api.doptime.com", ApiKey: ""}
 
-var APISource = []*ApiSourceHttp{_defaultHttpRPC}
+var apiSources = []*ApiSourceHttp{_defaultHttpRPC}
+var Servers cmap.ConcurrentMap[string, *ApiSourceHttp] = cmap.New[*ApiSourceHttp]()
 
 func init() {
-	config.LoadToml("APISource", &APISource)
+	config.LoadToml("APISource", &apiSources)
+	Servers.Set(_defaultHttpRPC.Name, _defaultHttpRPC)
+	for _, api := range apiSources {
+		Servers.Set(api.Name, api)
+	}
 }
