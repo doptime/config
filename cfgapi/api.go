@@ -1,4 +1,4 @@
-package api
+package cfgapi
 
 import (
 	"github.com/doptime/config"

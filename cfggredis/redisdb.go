@@ -1,4 +1,4 @@
-package redisdb
+package cfgredis
 
 import (
 	"context"

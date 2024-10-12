@@ -12,25 +12,21 @@ ConfigUrl = ""
   Port = 6379
   DB = 0
 
-[Jwt]
-  Secret = ""
-  Fields = "*"
-
 [Http]
   CORES = "*"
   Port = 80
   Path = "/"
-  Enable = false
+	JwtSecret = ""
+  AutoDataAuth = false
   MaxBufferSize = 10485760
-
-[Api]
-  ServiceBatchSize = 64
-
-[Data]
-  AutoAuth = false
-
-[Setting]
-  LogLevel = 1
   SUToken = ""
+
+[[APISource]]
+	Name    = "doptime"
+  UrlBase = "https://api.doptime.cc"
+	ApiKey  = "yourapikeyhere"
+
+[Log]
+  LogLevel = 1
 
 ```
