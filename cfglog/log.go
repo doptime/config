@@ -2,8 +2,8 @@ package cfglog
 
 import (
 	"github.com/doptime/config"
+	"github.com/doptime/logger"
 
-	"github.com/doptime/doptime/dlog"
 	"github.com/rs/zerolog"
 )
 
@@ -20,6 +20,6 @@ func init() {
 	//apply log level
 	if option.LogLevel >= -1 && option.LogLevel <= 7 {
 		LogLevel = option.LogLevel
-		dlog.Logger.Level(zerolog.Level(option.LogLevel))
+		logger.Logger.Level(zerolog.Level(option.LogLevel))
 	}
 }

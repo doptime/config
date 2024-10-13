@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/doptime/config/utils"
+	"github.com/doptime/logger"
 
 	"github.com/doptime/config"
 
-	"github.com/doptime/doptime/dlog"
 	cmap "github.com/orcaman/concurrent-map/v2"
 	"github.com/redis/go-redis/v9"
 )
@@ -38,7 +38,7 @@ var redisSources []*DataSource
 var Servers cmap.ConcurrentMap[string, *redis.Client] = cmap.New[*redis.Client]()
 
 func AfterLoad() (err error) {
-	dlog.Info().Str("Checking Redis", "Start").Send()
+	logger.Info().Str("Checking Redis", "Start").Send()
 	for _, rdsCfg := range redisSources {
 		//apply configuration
 		redisOption := &redis.Options{
@@ -54,24 +54,24 @@ func AfterLoad() (err error) {
 		rdsClient := redis.NewClient(redisOption)
 		//test connection
 		if _, err = rdsClient.Ping(context.Background()).Result(); err != nil {
-			dlog.Fatal().Err(err).Any("Redis server ping error", rdsCfg.Host).Send()
+			logger.Fatal().Err(err).Any("Redis server ping error", rdsCfg.Host).Send()
 			return err //if redis server is not valid, exit
 		}
 		//save to the list
-		dlog.Info().Str("Redis Load ", "Success").Any("RedisUsername", rdsCfg.Username).Any("RedisHost", rdsCfg.Host).Any("RedisPort", rdsCfg.Port).Send()
+		logger.Info().Str("Redis Load ", "Success").Any("RedisUsername", rdsCfg.Username).Any("RedisHost", rdsCfg.Host).Any("RedisPort", rdsCfg.Port).Send()
 		Servers.Set(rdsCfg.Name, rdsClient)
 		timeCmd := rdsClient.Time(context.Background())
-		dlog.Info().Any("Redis server time: ", timeCmd.Val().String()).Send()
+		logger.Info().Any("Redis server time: ", timeCmd.Val().String()).Send()
 		//ping the address of redisAddress, if failed, print to log
 		utils.PingServer(rdsCfg.Host, true)
 	}
 	//check if default redis is set
 	if _rds, ok := Servers.Get("default"); !ok {
-		dlog.Warn().Msg("\"default\" redis server missing in Configuration. RPC will can not be received. Please ensure this is what your want")
+		logger.Warn().Msg("\"default\" redis server missing in Configuration. RPC will can not be received. Please ensure this is what your want")
 		return
 	} else {
 		Servers.Set("", _rds)
-		dlog.RdsClientToLog = _rds
+		logger.RdsClientToLog = _rds
 	}
 	return nil
 }

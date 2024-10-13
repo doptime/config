@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/doptime/doptime/dlog"
+	"github.com/doptime/logger"
 )
 
 var CfgUrl = struct {
@@ -58,19 +58,19 @@ var getCachedTomlFromUri = func() func() (page string, err error) {
 		httpClient := &http.Client{Timeout: time.Second * 6}
 		if resp, err = httpClient.Get(configUrl); err != nil {
 			err = fmt.Errorf("failed to download CONFIG_URL page: " + err.Error())
-			dlog.Error().Err(err).Str("Url", configUrl).Msg("LoadConfig_FromWeb failed")
+			logger.Error().Err(err).Str("Url", configUrl).Msg("LoadConfig_FromWeb failed")
 			return "", err
 		}
 		defer resp.Body.Close()
 		if resp.StatusCode != http.StatusOK {
-			dlog.Error().Str("Url", configUrl).Int("StatusCode", resp.StatusCode).Msg("LoadConfig_FromWeb failed")
+			logger.Error().Str("Url", configUrl).Int("StatusCode", resp.StatusCode).Msg("LoadConfig_FromWeb failed")
 			return "", fmt.Errorf("failed to download CONFIG_URL page: " + resp.Status)
 		}
 		//read the page
 		pageBytes, err = io.ReadAll(resp.Body)
 		if err != nil {
 			err = fmt.Errorf("failed to read CONFIG_URL page: " + err.Error())
-			dlog.Error().Err(err).Str("Url", configUrl).Msg("LoadConfig_FromWeb failed")
+			logger.Error().Err(err).Str("Url", configUrl).Msg("LoadConfig_FromWeb failed")
 			return "", err
 		}
 		return string(pageBytes), nil
@@ -104,7 +104,7 @@ func loadFromUrl(configUrl string, keyname string, configObj interface{}) (err e
 
 	//decode the page to the configuration object
 	if _, err = toml.Decode(page, configObj); err != nil {
-		dlog.Error().Err(err).Str("Url", configUrl).Msg("LoadConfig_FromWeb failed")
+		logger.Error().Err(err).Str("Url", configUrl).Msg("LoadConfig_FromWeb failed")
 		return
 	}
 	return saveTomlFile(keyname, configObj)
@@ -128,7 +128,7 @@ func saveTomlFile(keyname string, configObj interface{}) (err error) {
 
 	//write the configuration to the file
 	if err = toml.NewEncoder(writer).Encode(currentConfig); err != nil {
-		dlog.Error().Err(err).Msg("LoadConfig_FromWeb unable to save to toml file")
+		logger.Error().Err(err).Msg("LoadConfig_FromWeb unable to save to toml file")
 	}
 	return err
 }

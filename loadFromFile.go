@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
-	"github.com/doptime/doptime/dlog"
+	"github.com/doptime/logger"
 )
 
 func getConfigFilePath(filename string) string {
@@ -15,7 +15,7 @@ func getConfigFilePath(filename string) string {
 	)
 	//tomlPath is same path as the binary
 	if tomlFilePath, err = os.Executable(); err != nil {
-		dlog.Panic().Msg("Failed to get executable path")
+		logger.Panic().Msg("Failed to get executable path")
 	}
 	tomlFilePath = filepath.Dir(tomlFilePath)
 	return tomlFilePath + filename
