@@ -13,46 +13,40 @@ func maskPassword(password string) string {
 	return password[:2] + strings.Repeat("*", len(password)-2)
 }
 
-func ToHidePswdString(obj interface{}) (jsonStr string) {
+func _toHidePswdString(obj interface{}) (obj1 interface{}) {
 	val := reflect.ValueOf(obj)
-	for val.Kind() == reflect.Ptr {
+	for val.Kind() == reflect.Ptr || val.Kind() == reflect.Pointer {
 		val = val.Elem()
 	}
-	if val.Kind() == reflect.Array {
+	var valKing = val.Kind()
+	//convert slice or array to []interface{}
+	if valKing == reflect.Slice || valKing == reflect.Array {
 		output := make([]interface{}, val.Len())
 		for i := 0; i < val.Len(); i++ {
-			output[i] = ToHidePswdString(val.Index(i).Interface())
+			output[i] = _toHidePswdString(val.Index(i).Interface())
 		}
-		bytes, _ := json.Marshal(output)
-		return string(bytes)
+		return output
 	} else if val.Kind() != reflect.Struct {
-		bytes, _ := json.Marshal(obj)
-		return string(bytes)
+		return val.Interface()
 	}
 
 	typ := val.Type()
-
-	// 创建一个 map 用于存储字段名和值
+	// convert struct to map[string]interface{}
 	output := make(map[string]interface{})
-
-	// 遍历结构体的字段
 	for i := 0; i < val.NumField(); i++ {
-		field := val.Field(i)
-		fieldType := typ.Field(i)
-
-		// 检查字段是否有 psw 标签
-		pswTag := fieldType.Tag.Get("psw")
-		if pswTag == "true" && field.Kind() == reflect.String {
-			// 处理带有 psw 标签的字段，隐藏密码
+		field, fieldType := val.Field(i), typ.Field(i)
+		if fieldType.Tag.Get("psw") == "true" && field.Kind() == reflect.String {
 			output[fieldType.Name] = maskPassword(field.String())
 		} else {
-			// 对于非 psw 标签的字段，直接加入输出
 			output[fieldType.Name] = field.Interface()
 		}
 	}
-
+	return output
+}
+func ToHidePswdString(obj interface{}) (jsonStr string) {
+	o1 := _toHidePswdString(obj)
 	// 将结果转换为 JSON
-	jsonBytes, err := json.Marshal(output)
+	jsonBytes, err := json.Marshal(o1)
 	if err != nil {
 		return "error: failed to marshal config to json string"
 	}
