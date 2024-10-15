@@ -18,7 +18,7 @@ func ToHidePswdString(obj interface{}) (jsonStr string) {
 	}
 	jsonStr = string(jsonBytes)
 	// Replace the password, keeping the first character and masking the rest
-	re := regexp.MustCompile(`("pswd[0-9]?":\s*")([^"]+)(")`)
+	re := regexp.MustCompile(`("pswd[0-9]*":\s*")([^"]+)(")`)
 	jsonStr = re.ReplaceAllStringFunc(jsonStr, func(match string) string {
 		submatches := re.FindStringSubmatch(match)
 		if len(submatches) == 4 {

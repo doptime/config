@@ -1,4 +1,4 @@
-package config
+package cfgurl
 
 import (
 	"fmt"
@@ -9,44 +9,35 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
+	"github.com/doptime/config/utils"
 	"github.com/doptime/logger"
 )
 
-var CfgUrl = struct {
-	ConfigUrl string `toml:"CONFIG_URL"`
-}{}
+// read from env as primary source, and then from the configuration file as secondary source
+var getConfigUrl = func() func() string {
+	var configUrl string
+	var loaded bool = false
 
-func getConfigUrl() (configUrl string) {
-	if CfgUrl.ConfigUrl != "" {
-		return CfgUrl.ConfigUrl
+	return func() (url string) {
+		if loaded {
+			return configUrl
+		}
+		loaded = true
+		//env first: try read from env
+		configUrl = os.Getenv("CONFIG_URL")
+		//secondary option: if not in env read from file
+		if configUrl == "" {
+			utils.LoadFromFile("CONFIG_URL", &configUrl)
+		}
+		return configUrl
 	}
-	//env first: try read from env
-	CfgUrl.ConfigUrl = os.Getenv("CONFIG_URL")
-	//secondary option: if not in env read from file
-	if CfgUrl.ConfigUrl == "" && loadFromFile(&CfgUrl) != nil {
-		return ""
-	}
-	saveTomlFile("CONFIG_URL", CfgUrl.ConfigUrl)
-	return CfgUrl.ConfigUrl
-}
+}()
 
 var getCachedTomlFromUri = func() func() (page string, err error) {
-	var configUrl string = os.Getenv("CONFIG_URL")
+	var configUrl string = getConfigUrl()
 	var LastLoadTime time.Time = time.Now().Add(-time.Hour * 24 * 365)
 	var LastCachedPage string = ""
 
-	type ConfigUrl struct {
-		ConfigUrl string
-	}
-
-	//read from env as primary source, and then from the configuration file as secondary source
-	if configUrl == "" {
-		var cfgurl ConfigUrl
-		err := loadFromFile(&cfgurl)
-		if err != nil {
-			configUrl = CfgUrl.ConfigUrl
-		}
-	}
 	downloadPage := func() (page string, err error) {
 		//return if the url is not valid or empty
 		if !strings.HasPrefix(strings.ToLower(configUrl), "http") {
@@ -92,7 +83,7 @@ var getCachedTomlFromUri = func() func() (page string, err error) {
 	}
 }()
 
-func loadFromUrl(configUrl string, keyname string, configObj interface{}) (err error) {
+func LoadFromUrl(keyname string, configObj interface{}) (err error) {
 	var (
 		page string
 	)
@@ -104,31 +95,8 @@ func loadFromUrl(configUrl string, keyname string, configObj interface{}) (err e
 
 	//decode the page to the configuration object
 	if _, err = toml.Decode(page, configObj); err != nil {
-		logger.Error().Err(err).Str("Url", configUrl).Msg("LoadConfig_FromWeb failed")
+		logger.Error().Err(err).Str("Url", getConfigUrl()).Msg("LoadConfig_FromWeb failed")
 		return
 	}
-	return saveTomlFile(keyname, configObj)
-}
-
-func saveTomlFile(keyname string, configObj interface{}) (err error) {
-	var (
-		writer *os.File
-	)
-	currentConfig := map[string]interface{}{}
-	//save to the file
-	localConfigFile := getConfigFilePath("/config.toml")
-	//read In the current configuration, and decode to currentConfig
-	toml.DecodeFile(localConfigFile, &currentConfig)
-	currentConfig[keyname] = configObj
-
-	if writer, err = os.OpenFile(localConfigFile, os.O_CREATE|os.O_WRONLY, 0644); err != nil {
-		return
-	}
-	defer writer.Close()
-
-	//write the configuration to the file
-	if err = toml.NewEncoder(writer).Encode(currentConfig); err != nil {
-		logger.Error().Err(err).Msg("LoadConfig_FromWeb unable to save to toml file")
-	}
-	return err
+	return utils.SaveTomlFile(keyname, configObj)
 }
