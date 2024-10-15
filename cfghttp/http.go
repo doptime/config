@@ -16,7 +16,7 @@ type ConfigHttp struct {
 
 	// super user token, this is used to bypass the security check in data access
 	// SUToken is designed to allow debugging in production environment without  change the permission table permanently
-	SUToken string `json:"pswd1"`
+	SUToken string `psw:"true"`
 }
 
 var CORES = "*"

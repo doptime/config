@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -22,15 +24,27 @@ func getConfigFilePath(filename string) string {
 }
 
 func LoadFromFile(key string, configObj interface{}) (err error) {
-
 	var (
-		tomlFile string = getConfigFilePath("/config.toml")
+		tomlFile string = getConfigFilePath("/config.toml") // Assuming getConfigFilePath is defined elsewhere
 		data            = make(map[string]interface{})
+		bytes    []byte
 	)
-	data[key] = configObj
 
-	_, err = toml.DecodeFile(tomlFile, configObj)
-	return err
+	// Read from the file and decode into the map
+	if _, err = toml.DecodeFile(tomlFile, &data); err != nil {
+		return fmt.Errorf("error decoding toml file: %w", err)
+	}
+
+	// Check if the key exists in the data
+
+	if d, ok := data[key]; !ok {
+		return fmt.Errorf("key %s not found in config file", key)
+	} else if bytes, err = json.Marshal(d); err != nil {
+		return fmt.Errorf("error encoding data into bytes: %w", err)
+	} else if err = json.Unmarshal(bytes, configObj); err != nil {
+		return fmt.Errorf("error decoding data into configObj: %w", err)
+	}
+	return nil
 }
 
 func SaveTomlFile(keyname string, configObj interface{}) (err error) {

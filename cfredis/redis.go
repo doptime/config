@@ -16,11 +16,11 @@ import (
 
 type DataSource struct {
 	Name     string
-	Username string `env:"Username"`
-	Password string `env:"Password" json:"pswd"`
-	Host     string `env:"Host,required=true"`
-	Port     int64  `env:"Port,required=true"`
-	DB       int64  `env:"DB,required=true"`
+	Username string
+	Password string `psw:"true"`
+	Host     string
+	Port     int64
+	DB       int64
 }
 
 //config.toml example

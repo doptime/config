@@ -11,7 +11,7 @@ type ApiSourceHttp struct {
 	Name    string
 	UrlBase string
 	//also known as JWT token
-	ApiKey string `json:"pswd"`
+	ApiKey string `psw:"true"`
 }
 
 var _defaultHttpRPC = &ApiSourceHttp{Name: "doptime", UrlBase: "https://api.doptime.com", ApiKey: ""}
