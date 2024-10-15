@@ -7,7 +7,7 @@ import (
 )
 
 func LoadToml(keyname string, configObj interface{}) {
-	logger.Info().Msg("Loading configuration Item \"Http\" ..")
+	logger.Info().Msg("Config loading Item " + keyname + " ..")
 	//step1: load config from file
 	utils.LoadFromFile(keyname, configObj)
 	//step2: load config from env. this will overwrite the config from file

@@ -14,10 +14,9 @@ func maskPassword(password string) string {
 }
 
 func ToHidePswdString(obj interface{}) (jsonStr string) {
-	// 获取传入对象的反射值和类型
 	val := reflect.ValueOf(obj)
-	if val.Kind() == reflect.Ptr {
-		val = val.Elem() // 解引用
+	for val.Kind() == reflect.Ptr {
+		val = val.Elem()
 	}
 	if val.Kind() == reflect.Array {
 		output := make([]interface{}, val.Len())
