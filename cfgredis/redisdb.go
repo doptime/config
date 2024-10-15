@@ -54,14 +54,13 @@ func AfterLoad() (err error) {
 		rdsClient := redis.NewClient(redisOption)
 		//test connection
 		if _, err = rdsClient.Ping(context.Background()).Result(); err != nil {
-			logger.Fatal().Err(err).Any("Redis server ping error", rdsCfg.Host).Send()
+			logger.Fatal().Err(err).Str("Redis Server", rdsCfg.Name).Any("client pint error", rdsCfg.Host).Send()
 			return err //if redis server is not valid, exit
 		}
 		//save to the list
-		logger.Info().Str("Redis Load ", "Success").Any("RedisUsername", rdsCfg.Username).Any("RedisHost", rdsCfg.Host).Any("RedisPort", rdsCfg.Port).Send()
 		Servers.Set(rdsCfg.Name, rdsClient)
 		timeCmd := rdsClient.Time(context.Background())
-		logger.Info().Any("Redis server time: ", timeCmd.Val().String()).Send()
+		logger.Info().Str("Redis Server", rdsCfg.Name).Str("Time: ", timeCmd.Val().String()).Send()
 		//ping the address of redisAddress, if failed, print to log
 		utils.PingServer(rdsCfg.Host, true)
 	}

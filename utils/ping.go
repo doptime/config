@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"slices"
 	"time"
 
@@ -22,26 +21,18 @@ func PingServer(domain string, skipRepeat bool) {
 	pingTaskServers = append(pingTaskServers, domain)
 
 	if pinger, err = ping.NewPinger(domain); err != nil {
-		logger.Info().AnErr("Step1.5 ERROR NewPinger", err).Send()
+		logger.Info().AnErr("ERROR NewPinger", err).Send()
 	}
 	pinger.Count = 4
 	pinger.Timeout = time.Second * 10
 	pinger.OnRecv = func(pkt *ping.Packet) {}
 
 	pinger.OnFinish = func(stats *ping.Statistics) {
-		// fmt.Printf("\n--- %s ping statistics ---\n", stats.Addr)
-		logger.Info().Str("Step1.5 Ping ", fmt.Sprintf("--- %s ping statistics ---", stats.Addr)).Send()
-		// fmt.Printf("%d Ping packets transmitted, %d packets received, %v%% packet loss\n",
-		// 	stats.PacketsSent, stats.PacketsRecv, stats.PacketLoss)
-		logger.Info().Str("Step1.5 Ping", fmt.Sprintf("%d/%d/%v%%", stats.PacketsSent, stats.PacketsRecv, stats.PacketLoss)).Send()
-
-		// fmt.Printf("Ping round-trip min/avg/max/stddev = %v/%v/%v/%v\n",
-		// 	stats.MinRtt, stats.AvgRtt, stats.MaxRtt, stats.StdDevRtt)
-		logger.Info().Str("Step1.5 Ping", fmt.Sprintf("%v/%v/%v/%v", stats.MinRtt, stats.AvgRtt, stats.MaxRtt, stats.StdDevRtt)).Send()
+		logger.Info().Str("Ping", domain).Str("Addr", stats.Addr).Any("Sent", stats.PacketsSent).Any("Recv", stats.PacketsRecv).Any("Loss", stats.PacketLoss).Any("Min", stats.MinRtt).Any("Avg", stats.MaxRtt).Any("Std", stats.StdDevRtt).Send()
 	}
 	go func() {
 		if err := pinger.Run(); err != nil {
-			logger.Info().AnErr("Step1.5 ERROR Ping", err).Send()
+			logger.Info().AnErr("ERROR Ping", err).Send()
 		}
 	}()
 }
