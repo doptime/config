@@ -20,7 +20,7 @@ func _toHidePswdString(obj interface{}) (obj1 interface{}) {
 	}
 	var valKing = val.Kind()
 	//convert slice or array to []interface{}
-	if valKing == reflect.Slice || valKing == reflect.Array {
+	if valKing == reflect.Slice {
 		output := make([]interface{}, val.Len())
 		for i := 0; i < val.Len(); i++ {
 			output[i] = _toHidePswdString(val.Index(i).Interface())
