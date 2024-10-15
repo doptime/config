@@ -10,7 +10,7 @@ type ConfigHttp struct {
 	Path  string
 	//MaxBufferSize is the max size of a task in bytes, default 10M
 	MaxBufferSize int64
-	JwtSecret     string
+	JwtSecret     string `psw:"true"`
 	//AutoAuth should never be true in production
 	AutoDataAuth bool
 

@@ -19,7 +19,14 @@ func ToHidePswdString(obj interface{}) (jsonStr string) {
 	if val.Kind() == reflect.Ptr {
 		val = val.Elem() // 解引用
 	}
-	if val.Kind() != reflect.Struct {
+	if val.Kind() == reflect.Array {
+		output := make([]interface{}, val.Len())
+		for i := 0; i < val.Len(); i++ {
+			output[i] = ToHidePswdString(val.Index(i).Interface())
+		}
+		bytes, _ := json.Marshal(output)
+		return string(bytes)
+	} else if val.Kind() != reflect.Struct {
 		bytes, _ := json.Marshal(obj)
 		return string(bytes)
 	}
