@@ -14,7 +14,7 @@ ConfigUrl = ""
   Port = 80
   Path = "/"
 	JwtSecret = ""
-  AutoDataAuth = false
+  DangerousAutoWhitelist = false
   MaxBufferSize = 10485760
   SUToken = ""
 

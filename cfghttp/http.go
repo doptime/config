@@ -12,7 +12,7 @@ type ConfigHttp struct {
 	MaxBufferSize int64
 	JwtSecret     string `psw:"true"`
 	//AutoAuth should never be true in production
-	AutoDataAuth bool
+	DangerousAutoWhitelist bool
 
 	// super user token, this is used to bypass the security check in data access
 	// SUToken is designed to allow debugging in production environment without  change the permission table permanently
@@ -24,7 +24,7 @@ var Port int64 = 80
 var Path = "/"
 var MaxBufferSize = int64(10485760)
 var JWTSecret string = ""
-var AutoDataAuth bool = false
+var DangerousAutoWhitelist bool = false
 var SUToken string = ""
 
 func init() {
@@ -35,6 +35,6 @@ func init() {
 	Path = httpOption.Path
 	MaxBufferSize = httpOption.MaxBufferSize
 	JWTSecret = httpOption.JwtSecret
-	AutoDataAuth = httpOption.AutoDataAuth
+	DangerousAutoWhitelist = httpOption.DangerousAutoWhitelist
 	SUToken = httpOption.SUToken
 }
