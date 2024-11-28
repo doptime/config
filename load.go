@@ -6,7 +6,7 @@ import (
 	"github.com/doptime/logger"
 )
 
-func LoadToml(keyname string, configObj interface{}) {
+func LoadItemFromToml(keyname string, configObj interface{}) {
 	logger.Info().Str("Config Item", keyname).Str("data", "loading ..").Send()
 	//step1: load config from file
 	utils.LoadFromFile(keyname, configObj)

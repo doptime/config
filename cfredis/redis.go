@@ -77,6 +77,6 @@ func AfterLoad() (err error) {
 }
 
 func init() {
-	config.LoadToml("Redis", &redisSources)
+	config.LoadItemFromToml("Redis", &redisSources)
 	AfterLoad()
 }

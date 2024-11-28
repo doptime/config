@@ -29,7 +29,7 @@ var SUToken string = ""
 
 func init() {
 	var httpOption ConfigHttp
-	config.LoadToml("Http", &httpOption)
+	config.LoadItemFromToml("Http", &httpOption)
 	CORES = httpOption.CORES
 	Port = httpOption.Port
 	Path = httpOption.Path

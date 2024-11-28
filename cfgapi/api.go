@@ -20,7 +20,7 @@ var apiSources = []*ApiSourceHttp{_defaultHttpRPC}
 var Servers cmap.ConcurrentMap[string, *ApiSourceHttp] = cmap.New[*ApiSourceHttp]()
 
 func init() {
-	config.LoadToml("APISource", &apiSources)
+	config.LoadItemFromToml("APISource", &apiSources)
 	Servers.Set(_defaultHttpRPC.Name, _defaultHttpRPC)
 	for _, api := range apiSources {
 		Servers.Set(api.Name, api)

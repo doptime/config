@@ -16,7 +16,7 @@ var option = Log{LogLevel: 1}
 var LogLevel int8 = 1
 
 func init() {
-	config.LoadToml("Log", &option)
+	config.LoadItemFromToml("Log", &option)
 	//apply log level
 	if option.LogLevel >= -1 && option.LogLevel <= 7 {
 		LogLevel = option.LogLevel
