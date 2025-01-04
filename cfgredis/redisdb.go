@@ -38,6 +38,11 @@ var redisSources []*DataSource
 var Servers cmap.ConcurrentMap[string, *redis.Client] = cmap.New[*redis.Client]()
 
 func AfterLoad() (err error) {
+	var (
+		ok               bool
+		defaultRdsSource *DataSource
+		defaultRds       *redis.Client
+	)
 	logger.Info().Str("Checking Redis", "Start").Send()
 	for _, rdsCfg := range redisSources {
 		//apply configuration
@@ -57,20 +62,22 @@ func AfterLoad() (err error) {
 			logger.Fatal().Err(err).Str("Redis Server", rdsCfg.Name).Any("client pint error", rdsCfg.Host).Send()
 			return err //if redis server is not valid, exit
 		}
+
+		if rdsCfg.Name == "" {
+			rdsCfg.Name = "default"
+		}
+		//set default redis server, with empty name or name is default
+		if defaultRds == nil || rdsCfg.Name == "default" {
+			defaultRds = rdsClient
+			Servers.Set("", defaultRds)
+		}
+
 		//save to the list
 		Servers.Set(rdsCfg.Name, rdsClient)
 		timeCmd := rdsClient.Time(context.Background())
 		logger.Info().Str("Redis Server", rdsCfg.Name).Str("Time: ", timeCmd.Val().String()).Send()
 		//ping the address of redisAddress, if failed, print to log
 		utils.PingServer(rdsCfg.Host, true)
-	}
-	//check if default redis is set
-	if _rds, ok := Servers.Get("default"); !ok {
-		logger.Warn().Msg("\"default\" redis server missing in Configuration. RPC will can not be received. Please ensure this is what your want")
-		return
-	} else {
-		Servers.Set("", _rds)
-		logger.RdsClientToLog = _rds
 	}
 	return nil
 }
