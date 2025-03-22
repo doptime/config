@@ -39,9 +39,7 @@ var Servers cmap.ConcurrentMap[string, *redis.Client] = cmap.New[*redis.Client](
 
 func AfterLoad() (err error) {
 	var (
-		ok               bool
-		defaultRdsSource *DataSource
-		defaultRds       *redis.Client
+		defaultRds *redis.Client
 	)
 	logger.Info().Str("Checking Redis", "Start").Send()
 	for _, rdsCfg := range redisSources {
